@@ -28,7 +28,9 @@ class CustomResponse(ResponseParser):
 col1, col3 = st.columns([4, 3])
 # Interface do Streamlit
 st.title("Análise e Manipulação de Planilhas com PandasAI")
-
+prompt = st.text_input(label="Escreva um prompt")
+if not prompt:
+    prompt = 'You are an agent specialized in analyzing and manipulating .csv spreadsheets.'
 # Verificar se o DataFrame foi carregado e armazenado
 if 'df' not in st.session_state:
     st.session_state.df = None
@@ -64,6 +66,7 @@ with col1:
                 st.session_state.df,  # Usar o DataFrame armazenado
                 config={
                     "llm": llm,
+                    "prompt":prompt,
                     "response_parser": CustomResponse,
                     "disable_safety": True
                 },
@@ -75,11 +78,13 @@ with col1:
                     answer = query_engine.chat(query)
                     st.write("✅ Resposta do modelo:")
                     st.write(answer)
+                     # Limpar o campo de texto após o envio
+                    st.session_state.query_input = ""  # Limpa o valor da área de texto
 
                     # Mostrar o DataFrame atualizado após a modificação
                     with st.expander("🔄 DataFrame atualizado"):
                         st.write(st.session_state.df)
-
+                    st.write("Lembre sempre de salvar o dataframe modificado ,sempre que ele atender as condições corretamente")
                     # Botão para salvar o DataFrame modificado
                     if st.button("📥 Salvar DataFrame Modificado"):
                         st.session_state.df = st.session_state.df.copy()
